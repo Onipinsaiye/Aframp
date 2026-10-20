@@ -48,20 +48,27 @@ export default function AdminUsersPage() {
           searchPlaceholder="Search name, email or merchant"
           emptyMessage="No users yet."
           columns={[
-            { header: 'Name', render: (row) => <span className="font-medium">{row.name}</span> },
-            { header: 'Email', render: (row) => row.email },
+            {
+              header: 'Name',
+              render: (row) => <span className="font-medium">{row.name}</span>,
+              exportValue: (row) => row.name,
+            },
+            { header: 'Email', render: (row) => row.email, exportValue: (row) => row.email },
             {
               header: 'Admin',
               render: (row) =>
                 row.is_admin ? <Badge>Admin</Badge> : <span className="text-dim">—</span>,
+              exportValue: (row) => (row.is_admin ? 'Admin' : 'User'),
             },
             {
               header: 'Merchant',
               render: (row) => row.merchant_name ?? <span className="text-dim">None</span>,
+              exportValue: (row) => row.merchant_name,
             },
             {
               header: 'Created',
               render: (row) => <span className="text-dim">{formatDateTime(row.created_at)}</span>,
+              exportValue: (row) => row.created_at,
             },
           ]}
         />

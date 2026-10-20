@@ -74,6 +74,7 @@ export default function AdminTransactionsPage() {
             {
               header: 'Merchant',
               render: (row) => <span className="font-medium">{row.merchant_name}</span>,
+               exportValue: (row) => row.merchant_name,
             },
             {
               header: 'Amount',
@@ -82,6 +83,7 @@ export default function AdminTransactionsPage() {
                   {formatStroops(row.amount_stroops)} {row.asset}
                 </span>
               ),
+               exportValue: (row) => formatStroops(row.amount_stroops).replace(/,/g, ''),
             },
             {
               header: 'Tx hash',
@@ -95,17 +97,24 @@ export default function AdminTransactionsPage() {
                   {shorten(row.tx_hash)}
                 </a>
               ),
+               exportValue: (row) => row.tx_hash,
             },
             {
               header: 'Status',
               render: (row) => (
                 <Badge variant={statusVariant(row.status)}>{STATUS_LABEL[row.status]}</Badge>
               ),
+               exportValue: (row) => STATUS_LABEL[row.status] ?? row.status,
             },
-            { header: 'Confirmations', render: (row) => row.confirmations },
+             {
+               header: 'Confirmations',
+               render: (row) => row.confirmations,
+               exportValue: (row) => row.confirmations,
+             },
             {
               header: 'Created',
               render: (row) => <span className="text-dim">{formatDateTime(row.created_at)}</span>,
+               exportValue: (row) => row.created_at,
             },
           ]}
         />

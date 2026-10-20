@@ -51,8 +51,16 @@ export default function AdminMerchantsPage() {
           searchPlaceholder="Search name, owner email or wallet"
           emptyMessage="No merchants yet."
           columns={[
-            { header: 'Name', render: (row) => <span className="font-medium">{row.name}</span> },
-            { header: 'Owner', render: (row) => row.owner_email },
+            {
+              header: 'Name',
+              render: (row) => <span className="font-medium">{row.name}</span>,
+              exportValue: (row) => row.name,
+            },
+            {
+              header: 'Owner',
+              render: (row) => row.owner_email,
+              exportValue: (row) => row.owner_email,
+            },
             {
               header: 'Wallet address',
               render: (row) =>
@@ -61,10 +69,12 @@ export default function AdminMerchantsPage() {
                 ) : (
                   <span className="text-dim">No wallet</span>
                 ),
+              exportValue: (row) => row.wallet_address,
             },
             {
               header: 'Created',
               render: (row) => <span className="text-dim">{formatDateTime(row.created_at)}</span>,
+              exportValue: (row) => row.created_at,
             },
           ]}
         />

@@ -1,15 +1,18 @@
 'use client'
 
 import { useMemo, useState } from 'react'
+import { Download } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { LoadingSpinner } from '@/components/ui/loading-spinner'
 import { ErrorState } from '@/components/ui/error-state'
 import { EmptyStateIllustration } from '@/components/ui/empty-state-illustration'
+import { downloadCsv, toCsv } from '@/lib/csv'
 
 interface Column<T> {
   header: string
   render: (row: T) => React.ReactNode
+  exportValue: (row: T) => string | number | bigint | null
   className?: string
 }
 
@@ -73,6 +76,14 @@ export function AdminTable<T>({
 
   const shown = matches.slice(0, visible)
 
+  const exportRows = () => {
+    const csv = toCsv(
+      columns.map((column) => column.header),
+      matches.map((row) => columns.map((column) => column.exportValue(row)))
+    )
+    downloadCsv(`aframp-admin-export-${new Date().toISOString().slice(0, 10)}.csv`, csv)
+  }
+
   return (
     <div className="space-y-3">
       {searchText && (
@@ -88,11 +99,19 @@ export function AdminTable<T>({
             }}
             className="max-w-sm"
           />
-          <p className="text-dim text-xs" aria-live="polite">
-            {matches.length === rows.length
-              ? `${rows.length.toLocaleString('en-NG')} rows`
-              : `${matches.length.toLocaleString('en-NG')} of ${rows.length.toLocaleString('en-NG')} rows`}
-          </p>
+          <div className="flex items-center gap-3">
+            <p className="text-dim text-xs" aria-live="polite">
+              {matches.length === rows.length
+                ? `${rows.length.toLocaleString('en-NG')} rows`
+                : `${matches.length.toLocaleString('en-NG')} of ${rows.length.toLocaleString('en-NG')} rows`}
+            </p>
+            {matches.length > 0 && (
+              <Button type="button" variant="outline" size="sm" onClick={exportRows}>
+                <Download className="size-4" aria-hidden />
+                Export CSV
+              </Button>
+            )}
+          </div>
         </div>
       )}
       <div className="bg-panel border-hairline overflow-x-auto rounded-2xl border">

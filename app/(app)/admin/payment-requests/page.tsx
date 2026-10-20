@@ -60,6 +60,7 @@ export default function AdminPaymentRequestsPage() {
             {
               header: 'Merchant',
               render: (row) => <span className="font-medium">{row.merchant_name}</span>,
+              exportValue: (row) => row.merchant_name,
             },
             {
               header: 'Amount',
@@ -68,10 +69,12 @@ export default function AdminPaymentRequestsPage() {
                   {formatStroops(row.amount_stroops)} {row.asset}
                 </span>
               ),
+              exportValue: (row) => formatStroops(row.amount_stroops).replace(/,/g, ''),
             },
             {
               header: 'Memo',
               render: (row) => <span className="text-dim">{row.memo || '—'}</span>,
+              exportValue: (row) => row.memo,
             },
             {
               header: 'Status',
@@ -80,14 +83,17 @@ export default function AdminPaymentRequestsPage() {
                   {row.status}
                 </Badge>
               ),
+              exportValue: (row) => row.status,
             },
             {
               header: 'Expires',
               render: (row) => <span className="text-dim">{formatDateTime(row.expires_at)}</span>,
+              exportValue: (row) => row.expires_at,
             },
             {
               header: 'Created',
               render: (row) => <span className="text-dim">{formatDateTime(row.created_at)}</span>,
+              exportValue: (row) => row.created_at,
             },
           ]}
         />

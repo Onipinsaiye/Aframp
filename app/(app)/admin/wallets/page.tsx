@@ -54,17 +54,24 @@ export default function AdminWalletsPage() {
             {
               header: 'Merchant',
               render: (row) => <span className="font-medium">{row.merchant_name}</span>,
+              exportValue: (row) => row.merchant_name,
             },
             {
               header: 'Address',
               render: (row) => (
                 <span className="font-mono text-xs">{shortenAddress(row.address)}</span>
               ),
+              exportValue: (row) => row.address,
             },
-            { header: 'Network', render: (row) => row.network },
+            {
+              header: 'Network',
+              render: (row) => row.network,
+              exportValue: (row) => row.network,
+            },
             {
               header: 'Created',
               render: (row) => <span className="text-dim">{formatDateTime(row.created_at)}</span>,
+              exportValue: (row) => row.created_at,
             },
           ]}
         />

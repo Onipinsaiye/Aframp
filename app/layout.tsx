@@ -4,6 +4,7 @@ import { headers } from 'next/headers'
 import { Atkinson_Hyperlegible } from 'next/font/google'
 import { ThemeProvider } from '@/components/theme-provider'
 import { SessionProvider } from '@/components/session-provider'
+import { ConnectivityBanner } from '@/components/connectivity-banner'
 import './globals.css'
 
 // The Aframp brand typeface — picked for legibility at small sizes,
@@ -47,6 +48,7 @@ export default async function RootLayout({
           disableTransitionOnChange
           nonce={nonce}
         >
+          <ConnectivityBanner />
           <SessionProvider>{children}</SessionProvider>
         </ThemeProvider>
         <script

@@ -60,6 +60,7 @@ export default function AdminWithdrawalsPage() {
             {
               header: 'Merchant',
               render: (row) => <span className="font-medium">{row.merchant_name}</span>,
+              exportValue: (row) => row.merchant_name,
             },
             {
               header: 'Amount',
@@ -68,6 +69,7 @@ export default function AdminWithdrawalsPage() {
                   {formatStroops(row.amount_stroops)} {row.asset}
                 </span>
               ),
+              exportValue: (row) => formatStroops(row.amount_stroops).replace(/,/g, ''),
             },
             {
               header: 'Status',
@@ -76,6 +78,7 @@ export default function AdminWithdrawalsPage() {
                   {row.status}
                 </Badge>
               ),
+              exportValue: (row) => row.status,
             },
             {
               header: 'Bank',
@@ -87,6 +90,10 @@ export default function AdminWithdrawalsPage() {
                 ) : (
                   <span className="text-dim">—</span>
                 ),
+              exportValue: (row) =>
+                row.bank_code && row.account_number
+                  ? `${row.bank_code} · ${row.account_number}`
+                  : null,
             },
             {
               header: 'Failure reason',
@@ -96,10 +103,12 @@ export default function AdminWithdrawalsPage() {
                 ) : (
                   <span className="text-dim">—</span>
                 ),
+              exportValue: (row) => row.failure_reason,
             },
             {
               header: 'Created',
               render: (row) => <span className="text-dim">{formatDateTime(row.created_at)}</span>,
+              exportValue: (row) => row.created_at,
             },
           ]}
         />

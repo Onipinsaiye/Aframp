@@ -1,5 +1,11 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import { AdminTable } from '../admin-table'
+import { downloadCsv, toCsv } from '@/lib/csv'
+
+jest.mock('@/lib/csv', () => ({
+  downloadCsv: jest.fn(),
+  toCsv: jest.fn(() => 'csv-content'),
+}))
 
 interface Row {
   id: string
@@ -16,7 +22,7 @@ function renderTable(props: Partial<React.ComponentProps<typeof AdminTable<Row>>
       onRetry={jest.fn()}
       getRowKey={(row) => row.id}
       emptyMessage="No rows yet."
-      columns={[{ header: 'Name', render: (row) => row.name }]}
+      columns={[{ header: 'Name', render: (row) => row.name, exportValue: (row) => row.name }]}
       searchText={(row) => row.name}
       searchPlaceholder="Search merchants"
       {...props}
@@ -61,5 +67,22 @@ describe('AdminTable', () => {
   it('shows the empty message when there are no rows at all', () => {
     renderTable({ rows: [] })
     expect(screen.getByText('No rows yet.')).toBeInTheDocument()
+  })
+
+  it('exports every row matching the current search', () => {
+    renderTable()
+    fireEvent.change(screen.getByRole('searchbox', { name: 'Search merchants' }), {
+      target: { value: 'merchant 2' },
+    })
+    fireEvent.click(screen.getByRole('button', { name: /export csv/i }))
+
+    expect(toCsv).toHaveBeenCalledWith(
+      ['Name'],
+      rows.filter((row) => row.name.toLowerCase().includes('merchant 2')).map((row) => [row.name])
+    )
+    expect(downloadCsv).toHaveBeenCalledWith(
+      expect.stringMatching(/aframp-admin-export-.*\.csv/),
+      'csv-content'
+    )
   })
 })

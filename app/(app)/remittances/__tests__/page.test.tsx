@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { api, ApiError, type Remittance } from '@/lib/api'
 import RemittancesPage from '../page'
 
@@ -174,8 +174,36 @@ describe('RemittancesPage', () => {
       expect(screen.getByText(/0.1 XLM/)).toBeInTheDocument()
       expect(screen.getByText(/0.2 XLM/)).toBeInTheDocument()
       expect(screen.getByText(/Failure reason: Invalid destination address/)).toBeInTheDocument()
-      expect(screen.getByText('Confirmed')).toBeInTheDocument()
-      expect(screen.getByText('Failed')).toBeInTheDocument()
+      expect(screen.getAllByText('Confirmed')).toHaveLength(2)
+      expect(screen.getAllByText('Failed')).toHaveLength(2)
     })
+  })
+
+  it('filters remittances and paginates the filtered results', async () => {
+    const remittances: Remittance[] = Array.from({ length: 12 }, (_, index) => ({
+      id: String(index + 1),
+      merchant_id: 'merchant-1',
+      destination_address: `Destination ${index + 1}`,
+      amount_stroops: 1000000n,
+      asset: 'XLM',
+      memo: null,
+      status: index === 0 ? 'failed' : 'confirmed',
+      tx_hash: null,
+      failure_reason: null,
+      created_at: `2024-01-${String(index + 1).padStart(2, '0')}T00:00:00Z`,
+      updated_at: `2024-01-${String(index + 1).padStart(2, '0')}T00:00:00Z`,
+    }))
+    ;(api.listRemittances as jest.Mock).mockResolvedValue(remittances)
+    render(<RemittancesPage />)
+
+    expect(await screen.findByText('Showing 1-10 of 12 remittances')).toBeInTheDocument()
+    expect(screen.queryByText('Destination 11')).not.toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Next' }))
+    expect(screen.getByText('Destination 11')).toBeInTheDocument()
+
+    fireEvent.change(screen.getByLabelText('Status'), { target: { value: 'failed' } })
+    expect(screen.getByText('Destination 1')).toBeInTheDocument()
+    expect(screen.queryByText('Destination 11')).not.toBeInTheDocument()
+    expect(screen.queryByRole('navigation', { name: 'Remittance pagination' })).not.toBeInTheDocument()
   })
 })

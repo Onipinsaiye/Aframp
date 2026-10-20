@@ -52,6 +52,19 @@ describe('LoginPage', () => {
     expect(signIn).not.toHaveBeenCalled()
   })
 
+  it('rejects a malformed email before submitting', async () => {
+    const user = userEvent.setup()
+    render(<LoginPage />)
+
+    await user.type(screen.getByLabelText(/email/i), 'not-an-email')
+    await user.type(screen.getByLabelText('Password'), 'secret-pass')
+    await user.click(screen.getByRole('button', { name: /sign in/i }))
+
+    expect(screen.getByRole('alert')).toHaveTextContent('Enter a valid email address.')
+    expect(screen.getByLabelText(/email/i)).toHaveAttribute('aria-invalid', 'true')
+    expect(signIn).not.toHaveBeenCalled()
+  })
+
   it('goes straight to /home for a legacy account that gets a session directly', async () => {
     const user = userEvent.setup()
     signIn.mockResolvedValue({ token: 't', user_id: 'u', merchant_id: 'm' })

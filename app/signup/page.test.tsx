@@ -54,6 +54,22 @@ describe('SignupPage', () => {
     expect(signUp).not.toHaveBeenCalled()
   })
 
+  it('rejects a malformed email before submitting', async () => {
+    const user = userEvent.setup()
+    render(<SignupPage />)
+
+    await user.type(screen.getByLabelText(/business name/i), 'Acme Pay')
+    await user.type(screen.getByLabelText(/email/i), 'not-an-email')
+    await user.type(screen.getByLabelText(/phone number/i), '08011122233')
+    await user.type(screen.getByLabelText(/^password$/i), 'verysecret')
+    await user.type(screen.getByLabelText(/confirm password/i), 'verysecret')
+    await user.click(screen.getByRole('button', { name: /create account/i }))
+
+    expect(screen.getByRole('alert')).toHaveTextContent('Enter a valid email address.')
+    expect(screen.getByLabelText(/email/i)).toHaveAttribute('aria-invalid', 'true')
+    expect(signUp).not.toHaveBeenCalled()
+  })
+
   it('stores challenge_id in sessionStorage and routes to /verify without it in the URL', async () => {
     const user = userEvent.setup()
     signUp.mockResolvedValue({ challenge_id: 'chal-456', expires_in_secs: 600 })
