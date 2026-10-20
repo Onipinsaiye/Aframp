@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { WifiOff } from 'lucide-react'
@@ -31,6 +31,8 @@ export default function SignupPage() {
   const router = useRouter()
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
+  const [emailError, setEmailError] = useState<string | null>(null)
+  const emailInputRef = useRef<HTMLInputElement>(null)
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [phone, setPhone] = useState('')
@@ -53,6 +55,13 @@ export default function SignupPage() {
       setSubmitting(false)
       return
     }
+
+    if (emailInputRef.current?.validity.typeMismatch) {
+      setEmailError('Enter a valid email address.')
+      setSubmitting(false)
+      return
+    }
+    setEmailError(null)
 
     // Mirrors the server's own check so the error lands next to the field.
     if (password.length < MIN_PASSWORD_LENGTH) {
@@ -115,13 +124,24 @@ export default function SignupPage() {
         <div className="space-y-2">
           <Label htmlFor="email">Email</Label>
           <Input
+            ref={emailInputRef}
             id="email"
             type="email"
             autoComplete="email"
             required
             value={email}
-            onChange={(event) => setEmail(event.target.value)}
+            aria-invalid={Boolean(emailError)}
+            aria-describedby={emailError ? 'email-error' : undefined}
+            onChange={(event) => {
+              setEmail(event.target.value)
+              setEmailError(null)
+            }}
           />
+          {emailError && (
+            <p id="email-error" role="alert" className="text-destructive text-xs">
+              {emailError}
+            </p>
+          )}
         </div>
 
         <div className="space-y-2">
